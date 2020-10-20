@@ -1,4 +1,5 @@
 import React from 'react';
+import Spinner from './Spinner';
 
 class TranscribeAudio extends React.Component {
     constructor(props) {
@@ -7,7 +8,9 @@ class TranscribeAudio extends React.Component {
         this.getAudioTranscription = this.getAudioTranscription.bind(this);
     }
     async getAudioTranscription() {
+        document.querySelector('#loader').style.display = 'block';
         const response = await fetch('http://localhost:8080/audio-transcription');
+        document.querySelector('#loader').style.display = 'none';
         if (!response.ok) {
             const errMessage = `An error has occured: ${response.status}`;
             console.log(errMessage)
@@ -19,14 +22,14 @@ class TranscribeAudio extends React.Component {
         this.setState(state => ({
             audioTranscriptionString: audioData.transcribed
         }));
-
-        
     }
 
     render() {
         return (
             <div>
                 <button type="button" onClick={this.getAudioTranscription}>Transcribe</button>
+                <div id="loader" style={{display: "none"}}><Spinner /></div>
+                <h2>Transcription:</h2>
                 <p>{this.state.audioTranscriptionString}</p>
             </div>
         );
