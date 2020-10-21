@@ -1,47 +1,84 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+const bodyParser = require("body-parser");
 require("dotenv").config();
+const Multer = require("multer");
 const PORT = process.env.PORT;
 // Imports the Google Cloud client library.
-const {Storage} = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
+const format = require("util").format;
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET"
-  );
-
-  // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-
-  next();
-})
+app.use(cors());
+app.use(bodyParser.json());
+const multer = Multer({
+  storage: Multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // no larger than 5mb, you can change as needed.
+  },
+});
 
 // Instantiates a client. If you don't specify credentials when constructing
 // the client, the client library will look for credentials in the
 // environment.
 const storage = new Storage();
 // Makes an authenticated API request.
-async function listBuckets() {
+async function getBucketIds() {
   try {
     const results = await storage.getBuckets();
 
     const [buckets] = results;
 
-    console.log('Buckets:');
-    buckets.forEach((bucket) => {
-      console.log(bucket.name);
+    console.log("Buckets:");
+    const bucketIds = buckets.map((bucket) => {
+      return bucket.id;
     });
+    console.log(bucketIds);
+    return bucketIds;
+
   } catch (err) {
-    console.error('ERROR:', err);
+    console.error("ERROR:", err);
   }
-}
-listBuckets();
+};
+
+const fileStorageBucketIds = getBucketIds();
+const fileStorageProdBucket = storage.bucket('kool-292023.appspot.com');
+const fileStorageDevBucket = storage.bucket('staging.kool-292023.appspot.com');
+console.log(fileStorageDevBucket);
+
+app.post("/api/upload-file", multer.single("audioFile"), (req, res, next) => {
+  if (!req.file) {
+    res.status(400).send("No file uploaded.");
+    return;
+  }
+
+  // Create a new blob in the bucket and upload the file data.
+  const blob = fileStorageDevBucket.file(`${Date.now()}_${req.file.originalname}`);
+  const blobStream = blob.createWriteStream();
+
+  blobStream.on("error", (err) => {
+    next(err);
+  });
+
+  blobStream.on("finish", () => {
+    // The public URL can be used to directly access the file via HTTP.
+    const publicUrl = format(
+      `https://storage.googleapis.com/upload/storage/v1/b/staging.kool-292023.appspot.com/${blob.name}`
+    );
+    res.status(200).send(publicUrl);
+  });
+
+  blobStream.end(req.file.buffer);
+});
+
+async function getLatestFile() {
+  try {
+    console.log("test get file");
+
+  } catch (err) {
+    console.error("ERROR:", err);
+  }
+};
 
 app.get("/audio-transcription", (req, res) => {
   // Set up gcloud speech API

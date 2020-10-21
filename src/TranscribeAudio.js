@@ -4,7 +4,10 @@ import Spinner from './Spinner';
 class TranscribeAudio extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {audioTranscriptionString: ""};
+        this.state = {
+            audioTranscriptionString: "",
+            selectedFile: null
+    };
         this.getAudioTranscription = this.getAudioTranscription.bind(this);
     }
     async getAudioTranscription() {
@@ -26,12 +29,24 @@ class TranscribeAudio extends React.Component {
 
     render() {
         return (
-            <div>
-                <button type="button" onClick={this.getAudioTranscription}>Transcribe</button>
-                <div id="loader" style={{display: "none"}}><Spinner /></div>
-                <h2>Transcription:</h2>
-                <p>{this.state.audioTranscriptionString}</p>
+          <div>
+            <button type="button" onClick={this.getAudioTranscription}>
+              Transcribe
+            </button>
+            <form
+              action="api/upload-file"
+              method="post"
+              encType="multipart/form-data"
+            >
+              <input type="file" name="audioFile" />
+              <input type="submit" value="Upload File" name="submit" />
+            </form>
+            <div id="loader" style={{ display: "none" }}>
+              <Spinner />
             </div>
+            <h2>Transcription:</h2>
+            <p>{this.state.audioTranscriptionString}</p>
+          </div>
         );
     }
 }
