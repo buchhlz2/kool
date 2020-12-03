@@ -24,7 +24,7 @@
   "scripts": {
     "start": "NODE_ENV=production npm run server",
     "dev": "concurrently \"PORT=3000 react-scripts start\" \"npm run server\" ",
-    "postinstall": "(cd backend && npm install) && (cd frontend && npm install) && (cd frontend && npm run build)",
+    "postinstall": "npm install",
     "server": "node index.js",
     "dev-server": "nodemon index.js",
     "build": "react-scripts build",
