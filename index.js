@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require("path");
 require("dotenv").config();
 const Multer = require("multer");
 const PORT = process.env.PORT || 8080;
+const ENV = process.env.NODE_ENV || "development";
 // Imports the Google Cloud client library.
 const { Storage } = require('@google-cloud/storage');
 const format = require("util").format;
@@ -120,6 +122,21 @@ app.get("/audio-transcription", (req, res) => {
   }
   main().catch(console.error);
 });
+
+if (ENV === "production") {
+  app.use(express.static(path.join(__dirname, "./build")));
+
+  app.get("/*", (req, res) => {
+    res.sendFile(
+      path.join(__dirname, "./build/index.html"),
+      (err) => {
+        if (err) {
+          res.status(500).send(err);
+        }
+      }
+    );
+  });
+};
 
 app.listen(PORT, () => {
   console.log(`App listening at on port ${PORT}`);

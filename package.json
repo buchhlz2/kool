@@ -16,12 +16,15 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "multer": "^1.4.2",
+    "path": "^0.12.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.4"
   },
   "scripts": {
-    "start": "concurrently \"PORT=3000 react-scripts start\" \"npm run server\" ",
+    "start": "NODE_ENV=production npm run server",
+    "dev": "concurrently \"PORT=3000 react-scripts start\" \"npm run server\" ",
+    "postinstall": "(cd backend && npm install) && (cd frontend && npm install) && (cd frontend && npm run build)",
     "server": "node index.js",
     "dev-server": "nodemon index.js",
     "build": "react-scripts build",
