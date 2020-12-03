@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const Multer = require("multer");
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 // Imports the Google Cloud client library.
 const { Storage } = require('@google-cloud/storage');
 const format = require("util").format;

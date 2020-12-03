@@ -30,17 +30,24 @@ class TranscribeAudio extends React.Component {
     render() {
         return (
           <div>
+            <h2>Click the "Transcribe" button</h2>
             <button type="button" onClick={this.getAudioTranscription}>
               Transcribe
             </button>
-            <form
-              action="api/upload-file"
-              method="post"
-              encType="multipart/form-data"
-            >
-              <input type="file" name="audioFile" />
-              <input type="submit" value="Upload File" name="submit" />
-            </form>
+            <div className="wip">
+              <p>
+                * FILE SELECT/UPLOAD TO INTERACT WITH ML SPEECH API -- IS A WIP & NOT LIVE;
+                SHOWN FOR DEMO PURPOSES *
+              </p>
+              <form
+                action="api/upload-file"
+                method="post"
+                encType="multipart/form-data"
+              >
+                <input type="file" name="audioFile" />
+                <input type="submit" value="Upload File" name="submit" />
+              </form>
+            </div>
             <div id="loader" style={{ display: "none" }}>
               <Spinner />
             </div>
